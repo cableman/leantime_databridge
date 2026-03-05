@@ -1,0 +1,12 @@
+{
+    "name": "leantime/databridge",
+    "description": "An API for exposing user-centric ticket data to remote AI agents",
+    "license": "MIT",
+    "type": "leantime-plugin",
+    "version": "1.0.0",
+    "authors": [],
+    "homepage": "",
+    "require-dev": {},
+    "config": {},
+    "scripts": {}
+}
