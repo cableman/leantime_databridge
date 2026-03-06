@@ -60,12 +60,14 @@ class DatabridgeRepository
             ->leftJoin('zp_user as editor', 'editor.id', '=', 'ticket.editorId')
             ->where('ticket.type', '<>', 'milestone');
 
-        if (Schema::hasTable('zp_entity_relationship')) {
+        $entityAColumn = $this->getEntityAColumnName();
+
+        if ($entityAColumn !== null) {
             $query->leftJoin('zp_user as collab_user', function ($join) use ($username) {
                 $join->where('collab_user.username', '=', $username);
             })
-            ->leftJoin('zp_entity_relationship as er', function ($join) {
-                $join->on('er.entityA', '=', 'ticket.id')
+            ->leftJoin('zp_entity_relationship as er', function ($join) use ($entityAColumn) {
+                $join->on('er.'.$entityAColumn, '=', 'ticket.id')
                     ->where('er.entityAType', '=', 'Ticket')
                     ->where('er.entityBType', '=', 'User')
                     ->where('er.relationship', '=', 'Collaborator')
@@ -80,5 +82,23 @@ class DatabridgeRepository
         }
 
         return $query;
+    }
+
+    /**
+     * Detect the entityA column name in zp_entity_relationship.
+     *
+     * Returns 'entityA' (3.7.x), 'enitityA' (3.5.12 typo), or null if neither exists.
+     */
+    private function getEntityAColumnName(): ?string
+    {
+        if (Schema::hasColumn('zp_entity_relationship', 'entityA')) {
+            return 'entityA';
+        }
+
+        if (Schema::hasColumn('zp_entity_relationship', 'enitityA')) {
+            return 'enitityA';
+        }
+
+        return null;
     }
 }
